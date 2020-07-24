@@ -91,13 +91,28 @@ private func getOffset() -> CGFloat {
 ```
 >Use DragGesture to calculate the user's sliding position
 ```
-.overlay(self.underline, alignment: .bottomLeading)
-
-var underline: some View {
-  Color.red
-    .frame(width: 23, height: 5)
-    .padding(.leading, self.frames[self.index] ?? 0)
-}
+.gesture(
+        DragGesture()
+          .onChanged({ value in
+            self.isUserSwiping = true
+            self.offset = value.translation.width + -APPWidth * CGFloat(self.index)
+          })
+          .onEnded({ value in
+            if (value.translation.width < 0){
+              if value.predictedEndTranslation.width < APPWidth / 2, self.index < self.model.sections.count - 1 {
+                self.index += 1
+              }
+            }
+            else if (value.translation.width > 0){
+              if value.predictedEndTranslation.width > APPWidth / 2, self.index > 0 {
+                self.index -= 1
+              }
+            }
+            withAnimation {
+              self.isUserSwiping = false
+            }
+          })
+      )
 ```
 
 
